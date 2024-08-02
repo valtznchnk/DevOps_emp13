@@ -59,10 +59,11 @@ resource "yandex_compute_instance" "vm-1" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo apt update",
-      "sudo apt install -y maven git",
-      "sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.91/bin/apache-tomcat-9.0.91.tar.gz",
-      "tar zxvf apache-tomcat-*.tar.gz -C /opt/tomcat --strip-components 1",
+      "sudo -s",
+      "apt update",
+      "apt install -y maven git",
+      "wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.91/bin/apache-tomcat-9.0.91.tar.gz",
+      "mkdir /opt/tomcat && tar zxvf apache-tomcat-*.tar.gz -C /opt/tomcat --strip-components 1",
       "/opt/tomcat/bin/startup.sh",
       "mkdir -p ~/mywebapp1 && cd ~/mywebapp1 && sudo git pull https://github.com/valtznchnk/DevOps_emp_11_3.git",
       "mvn package",
@@ -109,10 +110,11 @@ resource "yandex_compute_instance" "vm-2" {
   }
   provisioner "remote-exec" {
     inline = [
+      "sudo -s",
       "sudo apt update",
       "sudo apt install -y maven git",
       "sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.91/bin/apache-tomcat-9.0.91.tar.gz",
-      "tar zxvf apache-tomcat-*.tar.gz -C /opt/tomcat --strip-components 1",
+      "mkdir /opt/tomcat && tar zxvf apache-tomcat-*.tar.gz -C /opt/tomcat --strip-components 1",
       "/opt/tomcat/bin/shutdown.sh && /opt/tomcat/bin/startup.sh",
     ]
 
