@@ -71,13 +71,6 @@ resource "yandex_compute_instance" "vm-1" {
       "/opt/tomcat/bin/shutdown.sh && /opt/tomcat/bin/startup.sh"
 
     ]
-
-    connection {
-      type     = "ssh"
-      user     = "ubuntu"
-      private_key = file("/root/.ssh/id_ed25519")
-      host     = yandex_compute_instance.vm-1.network_interface.0.nat_ip_address
-    }
   }
 }
 
@@ -117,13 +110,6 @@ resource "yandex_compute_instance" "vm-2" {
       "mkdir /opt/tomcat && tar zxvf apache-tomcat-*.tar.gz -C /opt/tomcat --strip-components 1",
       "/opt/tomcat/bin/shutdown.sh && /opt/tomcat/bin/startup.sh",
     ]
-
-    connection {
-      type     = "ssh"
-      user     = "ubuntu"
-      private_key = file("/root/.ssh/id_ed25519")
-      host     = yandex_compute_instance.vm-2.network_interface.0.nat_ip_address
-    }
   }
 }
 output "internal_ip_address_vm_1" {
