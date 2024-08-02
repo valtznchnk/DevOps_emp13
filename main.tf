@@ -50,18 +50,28 @@ resource "yandex_compute_instance" "vm-1" {
   metadata = {
     ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
     user-data = <<-EOF
-                #cloud-config
-                package_update: true
-                packages:
-                - maven
-                - git
-                runcmd:
-                  - mkdir -p ~/mywebapp
-                  - cd ~/mywebapp
-                  - git clone https://github.com/valtznchnk/DevOps_emp_11_3.git
-                  - mvn package
-                  - scp -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ~/mywebapp/target/hello-1.0.war ubuntu@{yandex_compute_instance.vm-2.network_interface.0.nat_ip_address}}:'scp -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 hello-1.0.war ubuntu@{yandex_compute_instance.vm-2.network_interface.0.nat_ip_address}}:/usr/local/webapps/'
-                EOF
+      #cloud-config
+      users:
+        - name: ubuntu
+          groups: [sudo]
+          shell: /bin/bash
+    EOF
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt update",
+      "sudo apt install -y maven tomcat git",
+      "mkdir -p ~/mywebapp1 && cd ~/mywebapp1 && sudo git pull https://github.com/valtznchnk/DevOps_emp_11_3.git",
+      "mvn package",
+      "scp -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ~/mywebapp/target/hello-1.0.war ubuntu@{yandex_compute_instance.vm-2.network_interface.0.nat_ip_address}}:'scp -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 hello-1.0.war ubuntu@{yandex_compute_instance.vm-2.network_interface.0.nat_ip_address}}:/usr/local/tomcat/webapps/'"
+    ]
+
+    connection {
+      type     = "ssh"
+      user     = "ubuntu"
+      private_key = file("~/.ssh/id_ed25519")
+      host     = yandex_compute_instance.vm-1.network_interface.0.nat_ip_address
+    }
   }
 }
 
@@ -85,11 +95,25 @@ resource "yandex_compute_instance" "vm-2" {
   metadata = {
     ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
     user-data = <<-EOF
-                #cloud-config
-                package_update: true
-                packages:
-                  - maven
-                EOF
+      #cloud-config
+      users:
+        - name: ubuntu
+          groups: [sudo]
+          shell: /bin/bash
+    EOF
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt update",
+      "sudo apt install -y maven tomcat git"
+    ]
+
+    connection {
+      type     = "ssh"
+      user     = "ubuntu"
+      private_key = file("~/.ssh/id_ed25519")
+      host     = yandex_compute_instance.vm-2.network_interface.0.nat_ip_address
+    }
   }
 }
 
